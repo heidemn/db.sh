@@ -2,6 +2,8 @@
 
 Roughly based on an example in Martin Kleppmann's book [Designing Data-Intensive Applications](https://dataintensive.net/).
 
+Additional, unique feature: The database file itself is also a valid Bash script 🤪🥴.
+
 ## How does it work?
 
 Startup: The database file is "sourced" to evaluate all assignments from previous runs.
@@ -19,13 +21,13 @@ Examples:
 
 ```bash
 # Write command:
-my_var="\"That's a hell of a database\", he said."
+myvar="\"That's a hell of a database\", he said."
 # ...is executed as:
-eval dbsh_my_var="\"That's a hell of a database\", he said."
-echo dbsh_my_var="\"That's a hell of a database\", he said." >> "$db_file"
+eval dbsh_myvar="\"That's a hell of a database\", he said."
+echo dbsh_myvar="\"That's a hell of a database\", he said." >> "$db_file"
 
 # Read command:
-my_var
+myvar
 # ...is executed as:
 printf eval "printf '%s\n' \"$dbsh_myvar\""
 ```
@@ -42,3 +44,5 @@ This code is using `eval`. Can this be safe?
 ## Should I use it in production?
 
 If you currently use a Powershell script as your database, then it could be an improvement.
+
+Otherwise, use it only if you like databases that allow arbitrary code execution.
