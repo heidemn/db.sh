@@ -8,6 +8,7 @@ echo2() {
 db_file="$HOME/.config/db.sh.data"
 cmd_cli=
 verbose=0
+kleppmann=0
 
 while [[ "$1" != "" ]]; do
     if [ "$1" = "-c" ]; then
@@ -21,23 +22,28 @@ while [[ "$1" != "" ]]; do
         db_file="$2"
         shift
         shift
+    elif [ "$1" = "-k" ] || [ "$1" = "--kleppmann" ]; then
+        kleppmann=1
+        shift
     else
         echo "ERROR: Unknown option '$1'"
         exit 1
     fi
 done
 
-db_dir="$( dirname "$db_file" )"
-echo2 "Reading persistent data from \"$db_file\"..."
-if [ -f "$db_file" ]; then
-    if [ "$verbose" = 1 ]; then
-        cat "$db_file" >&2
+if [ "$kleppmann" = 0 ]; then
+    db_dir="$( dirname "$db_file" )"
+    echo2 "Reading persistent data from \"$db_file\"..."
+    if [ -f "$db_file" ]; then
+        if [ "$verbose" = 1 ]; then
+            cat "$db_file" >&2
+        fi
+        . "$db_file"
+        echo2 "Done."
+    else
+        echo2 "File not found. -> Starting with empty database."
+        mkdir -pv "$db_dir"
     fi
-    . "$db_file"
-    echo2 "Done."
-else
-    echo2 "File not found. -> Starting with empty database."
-    mkdir -pv "$db_dir"
 fi
 
 if [ "$cmd_cli" = "" ]; then
@@ -61,7 +67,17 @@ while true; do
         continue
     fi
 
-    if [[ "$cmd" =~ = ]]; then
+    if [ "$kleppmann" = 1 ]; then
+        # 90% the example code from the book.
+        # Avoids 99% of the security issues, but doesn't store the database as a Bash script.
+        if [[ "$cmd" =~ = ]]; then
+            echo2 "WRITE $cmd"
+            echo "$cmd" >> "$db_file"
+        else
+            echo2 "READ $cmd"
+            grep "^$cmd=" "$db_file" | sed -e "s/^$cmd=//" | tail -1
+        fi
+    elif [[ "$cmd" =~ = ]]; then
         echo2 "WRITE $cmd"
         # Save for current process:
         eval "dbsh_$cmd"

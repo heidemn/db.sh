@@ -41,6 +41,10 @@ This code is using `eval`. Can this be safe?
 ./db.sh: line 62: No, of course not...: command not found
 ```
 
+Since this seems too dangerous, the option `-k` was added.  
+The code then follows mostly the example from the book.  
+This avoids 99% of the security issues, but doesn't store the database as real a Bash script any more.
+
 ## Should I use it in production?
 
 If you currently use a Powershell script as your database, then it could be an improvement.
